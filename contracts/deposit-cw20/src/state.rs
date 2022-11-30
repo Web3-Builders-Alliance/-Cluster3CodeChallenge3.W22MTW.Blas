@@ -43,14 +43,16 @@ pub struct Deposits {
 pub struct Cw721Deposits {
     pub owner: String,
     pub contract:String,
-    pub token_id:String
+    pub token_id:String,
+    pub cw20_contract_address: String,   //market place contract address 
+    pub ask_price: Uint128,              //Price you have to meet to buy
 }
 
 pub struct Cw20DepositIndexes<'a> {
     pub count: MultiIndex<'a, u64, Cw20Deposits, &'a str>,
     pub owner: MultiIndex<'a, String, Cw20Deposits, &'a str>,
 }
-
+// This impl seems to be general
 impl<'a> IndexList<Cw20Deposits> for Cw20DepositIndexes<'a> {
     fn get_indexes(&'_ self) -> Box<dyn Iterator<Item = &'_ dyn Index<Cw20Deposits>> + '_> {
         let v: Vec<&dyn Index<Cw20Deposits>> = vec![&self.count, &self.owner];
@@ -61,7 +63,7 @@ impl<'a> IndexList<Cw20Deposits> for Cw20DepositIndexes<'a> {
 pub struct Cw721DepositIndexes<'a> {
     pub owner: MultiIndex<'a, String, Cw721Deposits, &'a str>,
 }
-
+// This impl seems to be general
 impl<'a> IndexList<Cw721Deposits> for Cw721DepositIndexes<'a> {
     fn get_indexes(&'_ self) -> Box<dyn Iterator<Item = &'_ dyn Index<Cw721Deposits>> + '_> {
         let v: Vec<&dyn Index<Cw721Deposits>> = vec![&self.owner];
@@ -98,6 +100,7 @@ where
                 "total_cw20_deposits_change",
                 Strategy::EveryBlock,
             ),
+            // pk: primary key -- d: data
             cw20_deposits: IndexedMap::new(
                 "cw20_deposits",
                 Cw20DepositIndexes {

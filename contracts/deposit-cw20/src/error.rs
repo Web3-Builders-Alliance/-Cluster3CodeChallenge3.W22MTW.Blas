@@ -1,4 +1,4 @@
-use cosmwasm_std::StdError;
+use cosmwasm_std::{StdError, Uint128};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -23,5 +23,8 @@ pub enum ContractError {
 
     #[error("Contract does not possess token_id from this cw721 to withdraw")]
     NoCw721ToWithdraw {},
+
+    #[error("Please attach at least {ask_price} tokens")]
+    InsufficientPayment { ask_price: Uint128},
 
 }
