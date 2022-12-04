@@ -225,10 +225,10 @@ where
 
         let data = Cw721Deposits {
             owner: owner.clone(),
-            contract: info.sender.into_string(),  // The contract that is relaying the message from the user and has deposited the NFT
+            contract: info.sender.into_string(),  // cw721 contract address: nft contract address
             token_id: token_id.clone(),
-            cw20_contract_address : cw20_contract_address.clone(), 
-            ask_price : ask_price.clone()
+            cw20_contract_address : cw20_contract_address.clone(),      // ADDED: marketplace_contract_address
+            ask_price : ask_price.clone()                               // ADDED
         };
 
         // The block height is added because it is an IndexedSnapshotMap
@@ -244,9 +244,9 @@ where
         Ok(Response::new()
             .add_attribute("execute", "cw721_deposit")
             .add_attribute("owner", owner)
-            .add_attribute("cw20_contract_address", cw20_contract_address)
+            .add_attribute("nft_contract_address", cw20_contract_address)
             .add_attribute("ask_price", ask_price)
-            .add_attribute("contract", cw721_contract_address.to_string()))
+            .add_attribute("market_place_contract", cw721_contract_address.to_string()))
     }
 
 // contract.execute_cw721_purchase(deps, env, info, cw20_msg.sender, cw20_msg.amount, token_id, nft_contract_address)
@@ -271,18 +271,18 @@ where
             .load(deps.storage, (&nft_contract_address, &token_id))
             .unwrap();
 
-            if nft.ask_price != amount {
-                return Err(ContractError::InsufficientPayment { ask_price: nft.ask_price });
-            }
-    
-            self.cw721_deposits
-                .remove(deps.storage, (&nft_contract_address, &token_id), env.block.height)
-                .unwrap();
-    
-            let exe_msg = nft::contract::ExecuteMsg::TransferNft {
-                recipient: owner.clone(),
-                token_id: token_id.clone(),
-            };
+        if nft.ask_price != amount {
+            return Err(ContractError::InsufficientPayment { ask_price: nft.ask_price });
+        }
+
+        self.cw721_deposits
+            .remove(deps.storage, (&nft_contract_address, &token_id), env.block.height)
+            .unwrap();
+
+        let exe_msg = nft::contract::ExecuteMsg::TransferNft {
+            recipient: owner.clone(),
+            token_id: token_id.clone(),
+        };
         let msg = WasmMsg::Execute {
             contract_addr: nft_contract_address.clone(),  //###############???????????????????######  cw20_contract_address????
             msg: to_binary(&exe_msg)?,

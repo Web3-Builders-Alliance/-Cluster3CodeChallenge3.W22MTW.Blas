@@ -22,10 +22,6 @@ where
     fn execute_cw721_withdraw(&self, deps: DepsMut, env:Env, info: MessageInfo, contract:String, token_id: String) -> Result<Response<C>, Self::Err>;
 }
 
-
-
-
-
 pub trait DepositQuery {
     fn query_deposits(&self, deps: Deps, address: String) -> StdResult<DepositResponse>;
     fn query_cw20_deposits(&self, deps: Deps, address: String) -> StdResult<Cw20DepositResponse>;

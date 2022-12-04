@@ -44,8 +44,8 @@ pub struct Cw721Deposits {
     pub owner: String,
     pub contract:String,
     pub token_id:String,
-    pub cw20_contract_address: String,   //market place contract address 
-    pub ask_price: Uint128,              //Price you have to meet to buy
+    pub cw20_contract_address: String,   //Added: market place contract address 
+    pub ask_price: Uint128,              //Added: Price you have to meet to buy
 }
 
 pub struct Cw20DepositIndexes<'a> {
